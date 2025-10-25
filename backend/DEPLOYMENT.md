@@ -1,5 +1,13 @@
 # QuickPoll Deployment Guide - Render.com + PostgreSQL
 
+## 🎉 DEPLOYMENT SUCCESSFUL!
+
+**Live API URL:** https://quickpoll-api-l9db.onrender.com
+
+**API Documentation (Swagger UI):** https://quickpoll-api-l9db.onrender.com/docs
+
+**Interactive API Docs (ReDoc):** https://quickpoll-api-l9db.onrender.com/redoc
+
 ## Step-by-Step Deployment Process
 
 ### Step 1: Prepare Your Code for Deployment
