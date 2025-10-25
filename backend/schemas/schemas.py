@@ -114,6 +114,27 @@ class PollCreate(PollBase):
         
         return cleaned_options
 
+class PollUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    
+    @field_validator('title')
+    @classmethod
+    def validate_title(cls, v):
+        if v is not None:
+            if len(v.strip()) < 3:
+                raise ValueError('Poll title must be at least 3 characters long')
+            if len(v) > 200:
+                raise ValueError('Poll title must not exceed 200 characters')
+        return v
+    
+    @field_validator('description') 
+    @classmethod
+    def validate_description(cls, v):
+        if v is not None and len(v) > 1000:
+            raise ValueError('Poll description must not exceed 1000 characters')
+        return v
+
 class PollResponse(PollBase):
     id: int
     creator_id: int
