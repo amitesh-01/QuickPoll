@@ -1,14 +1,44 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, field_validator
 from typing import List, Optional
 from datetime import datetime
+import re
 
 # User Schemas
 class UserBase(BaseModel):
     username: str
     email: str
+    
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, v):
+        # Email regex pattern
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, v):
+            raise ValueError('Invalid email format')
+        return v
+    
+    @field_validator('username')
+    @classmethod
+    def validate_username(cls, v):
+        if len(v) < 3:
+            raise ValueError('Username must be at least 3 characters long')
+        if len(v) > 50:
+            raise ValueError('Username must not exceed 50 characters')
+        if not re.match(r'^[a-zA-Z0-9_]+$', v):
+            raise ValueError('Username can only contain letters, numbers, and underscores')
+        return v
 
 class UserCreate(UserBase):
     password: str
+    
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, v):
+        if len(v) < 6:
+            raise ValueError('Password must be at least 6 characters long')
+        if len(v) > 100:
+            raise ValueError('Password must not exceed 100 characters')
+        return v
 
 class UserLogin(BaseModel):
     username: str
@@ -40,9 +70,49 @@ class PollOptionResponse(PollOptionBase):
 class PollBase(BaseModel):
     title: str
     description: Optional[str] = None
+    
+    @field_validator('title')
+    @classmethod
+    def validate_title(cls, v):
+        if len(v.strip()) < 3:
+            raise ValueError('Poll title must be at least 3 characters long')
+        if len(v) > 200:
+            raise ValueError('Poll title must not exceed 200 characters')
+        return v.strip()
+    
+    @field_validator('description')
+    @classmethod
+    def validate_description(cls, v):
+        if v is not None and len(v) > 1000:
+            raise ValueError('Poll description must not exceed 1000 characters')
+        return v
 
 class PollCreate(PollBase):
     options: List[str]  # List of option texts
+    
+    @field_validator('options')
+    @classmethod
+    def validate_options(cls, v):
+        if len(v) < 2:
+            raise ValueError('Poll must have at least 2 options')
+        if len(v) > 10:
+            raise ValueError('Poll cannot have more than 10 options')
+        
+        # Check for empty options
+        cleaned_options = [opt.strip() for opt in v if opt.strip()]
+        if len(cleaned_options) != len(v):
+            raise ValueError('All poll options must be non-empty')
+        
+        # Check for duplicate options
+        if len(set(cleaned_options)) != len(cleaned_options):
+            raise ValueError('Poll options must be unique')
+        
+        # Check option length
+        for opt in cleaned_options:
+            if len(opt) > 500:
+                raise ValueError('Each poll option must not exceed 500 characters')
+        
+        return cleaned_options
 
 class PollResponse(PollBase):
     id: int
