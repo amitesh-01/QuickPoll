@@ -1,0 +1,17 @@
+{
+  "name": "quickpoll-monorepo",
+  "version": "1.0.0",
+  "description": "QuickPoll - Real-time polling platform",
+  "scripts": {
+    "install": "cd frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm run dev",
+    "preview": "cd frontend && npm run preview"
+  },
+  "workspaces": [
+    "frontend"
+  ],
+  "keywords": ["react", "fastapi", "polling", "real-time"],
+  "author": "amitesh-01",
+  "license": "MIT"
+}
